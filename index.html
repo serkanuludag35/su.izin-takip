@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>İzin takip prototipi</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f2f4f1;--surf:#fff;--ink:#16252b;--mute:#66767c;--line:#dbe1dd;--acc:#17695a;--accsoft:#d5ebe5;--warn:#c27a1c;--warnsoft:#f8e6cf;--bad:#a3322b;--badsoft:#f4d9d6;--hol:#e3cbc6;--wk:#e4e8e5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1e;--surf:#17262c;--ink:#e6efec;--mute:#94a6aa;--line:#2a3d44;--acc:#5cc7ae;--accsoft:#1d4a40;--warn:#e9a24f;--warnsoft:#4a3517;--bad:#ef8a82;--badsoft:#4a2623;--hol:#5a3f3c;--wk:#22343a}}
+:root[data-theme="dark"]{--bg:#0f1a1e;--surf:#17262c;--ink:#e6efec;--mute:#94a6aa;--line:#2a3d44;--acc:#5cc7ae;--accsoft:#1d4a40;--warn:#e9a24f;--warnsoft:#4a3517;--bad:#ef8a82;--badsoft:#4a2623;--hol:#5a3f3c;--wk:#22343a}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.45 Figtree,system-ui,sans-serif}
+main{max-width:480px;margin:0 auto;padding:16px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+h1{font-size:20px;font-weight:800;margin:0}
+h2{font-size:15px;font-weight:600;margin:28px 0 10px}
+.seg{display:flex;background:var(--wk);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;color:var(--mute);font:600 14px Figtree,system-ui,sans-serif;padding:7px 14px;border-radius:8px;cursor:pointer}
+.seg button.on{background:var(--surf);color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.who{color:var(--mute);margin:0 0 4px}
+.hero{display:flex;align-items:flex-end;gap:14px}
+.hero b{font-size:104px;line-height:.85;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums}
+.hero span{padding-bottom:4px;color:var(--mute)}
+dl{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:20px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+dt{font-size:12px;color:var(--mute)}
+dd{margin:0;font-size:22px;font-weight:600}
+#grid{display:grid;grid-template-columns:30px repeat(31,1fr);gap:2px;align-items:center}
+#grid i{display:block;aspect-ratio:1;border-radius:2px;background:var(--surf)}
+#grid i.l{aspect-ratio:auto;background:none;font:normal 11px Figtree,system-ui,sans-serif;color:var(--mute)}
+#grid i:empty:not(.ap):not(.pe):not(.ho):not(.wk):not(.l){background:var(--surf)}
+#grid i.wk{background:var(--wk)}#grid i.ho{background:var(--hol)}#grid i.ap{background:var(--acc)}#grid i.pe{background:var(--warn)}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px;color:var(--mute)}
+.lg span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f label{display:grid;gap:4px;font-size:13px;color:var(--mute)}
+.f .w{grid-column:1/-1}
+input{font:400 16px Figtree,system-ui,sans-serif;color:var(--ink);background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:10px;width:100%}
+.pv{min-height:24px;margin:10px 0 6px;font-size:14px;color:var(--mute)}
+.pv.err{color:var(--bad)}.pv.ok{color:var(--acc)}
+.pri{width:100%;border:0;border-radius:10px;background:var(--acc);color:var(--surf);font:600 16px Figtree,system-ui,sans-serif;padding:13px;cursor:pointer}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+li small{display:block;color:var(--mute);font-size:13px}
+.tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.tag.onay{background:var(--accsoft);color:var(--acc)}.tag.bekle{background:var(--warnsoft);color:var(--warn)}.tag.red{background:var(--badsoft);color:var(--bad)}
+.act{display:flex;gap:6px}
+.act button{border:1px solid var(--line);background:var(--surf);color:var(--ink);font:600 13px Figtree,system-ui,sans-serif;padding:7px 11px;border-radius:8px;cursor:pointer}
+.act button[data-a="onay"]{background:var(--acc);border-color:var(--acc);color:var(--surf)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-weight:600;color:var(--mute);text-align:right;padding:6px 4px;font-size:12px}th:first-child,td:first-child{text-align:left}
+td{padding:10px 4px;border-top:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.empty{color:var(--mute);padding:12px 0}
+.ft{margin-top:32px;font-size:12px;color:var(--mute)}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#17695a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="İzin Takip">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+</head>
+<body>
+<main>
+<header>
+  <h1>İzin takip</h1>
+  <div class="seg"><button data-m="c" class="on">Çalışan</button><button data-m="h">İK</button></div>
+</header>
+
+<section id="vc">
+  <p class="who" id="who"></p>
+  <div class="hero"><b id="kalan"></b><span>gün yıllık izin<br>hakkın kaldı</span></div>
+  <dl id="dl"></dl>
+
+  <h2>2026 çizelgesi</h2>
+  <div id="grid"></div>
+  <div class="lg"><span style="--c:var(--acc)">Onaylı</span><span style="--c:var(--warn)">Beklemede</span><span style="--c:var(--hol)">Resmi tatil</span><span style="--c:var(--wk)">Hafta sonu</span></div>
+
+  <h2>Yeni izin talebi</h2>
+  <div class="f">
+    <label>Başlangıç<input type="date" id="a"></label>
+    <label>Bitiş<input type="date" id="b"></label>
+    <label class="w">Not (isteğe bağlı)<input id="n" maxlength="60"></label>
+  </div>
+  <p class="pv" id="pv" aria-live="polite"></p>
+  <button class="pri" id="go">Talep gönder</button>
+
+  <h2>Taleplerim</h2>
+  <ul id="rl"></ul>
+</section>
+
+<section id="vh" hidden>
+  <h2 style="margin-top:0">Onay bekleyen talepler</h2>
+  <ul id="pl"></ul>
+  <h2>Ekip bakiyeleri</h2>
+  <table id="tb"></table>
+</section>
+
+<p class="ft">Prototip: veriler örnektir ve sayfa kapanınca sıfırlanır. İzin hakkı kıdeme göre 14, 20 veya 26 gün olarak hesaplanır; resmi tatil listesi örnektir.</p>
+</main>
+
+<script>
+const H=new Set(["2026-01-01","2026-03-20","2026-03-21","2026-03-22","2026-04-23","2026-05-01","2026-05-19","2026-05-27","2026-05-28","2026-05-29","2026-05-30","2026-07-15","2026-08-30","2026-10-29","2027-01-01","2027-04-23","2027-05-01","2027-05-19","2027-07-15","2027-08-30","2027-10-29"]);
+const people=[
+  {ad:"Ayşe Demir",ise:"2019-03-04",dev:3},
+  {ad:"Mehmet Kaya",ise:"2023-06-12",dev:0},
+  {ad:"Zeynep Arslan",ise:"2012-01-09",dev:5}
+];
+let reqs=[
+  {id:1,k:0,a:"2026-02-09",b:"2026-02-13",d:5,s:"onay",n:"Kış tatili"},
+  {id:2,k:0,a:"2026-08-03",b:"2026-08-07",d:5,s:"onay",n:""},
+  {id:3,k:0,a:"2026-12-28",b:"2026-12-31",d:4,s:"bekle",n:"Yılbaşı"},
+  {id:4,k:1,a:"2026-12-07",b:"2026-12-11",d:5,s:"bekle",n:""},
+  {id:5,k:2,a:"2026-11-23",b:"2026-11-27",d:5,s:"bekle",n:"Aile ziyareti"},
+  {id:6,k:1,a:"2026-07-20",b:"2026-07-24",d:5,s:"onay",n:""}
+];
+let nid=7;
+const ST={onay:"Onaylandı",bekle:"Beklemede",red:"Reddedildi"};
+const $=s=>document.querySelector(s);
+const P=s=>{const[a,b,c]=s.split("-");return new Date(+a,b-1,+c)};
+const K=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const fd=s=>P(s).toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
+const rng=r=>r.a===r.b?fd(r.a):fd(r.a)+" – "+fd(r.b);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function wd(f,t){let n=0;for(let d=P(f);d<=P(t);d.setDate(d.getDate()+1)){const g=d.getDay();if(g&&g<6&&!H.has(K(d)))n++}return n}
+function yrs(h){const t=new Date(),a=P(h);let y=t.getFullYear()-a.getFullYear();if(t<new Date(t.getFullYear(),a.getMonth(),a.getDate()))y--;return y}
+const hak=y=>y<1?0:y<=5?14:y<15?20:26;
+function bal(k){const p=people[k],y=yrs(p.ise),h=hak(y);let u=0,b=0;reqs.forEach(r=>{if(r.k==k){if(r.s=="onay")u+=r.d;if(r.s=="bekle")b+=r.d}});return{y,h,dev:p.dev,t:h+p.dev,u,b,k:h+p.dev-u-b}}
+
+function draw(){
+  const B=bal(0);
+  $("#who").textContent=people[0].ad+", "+B.y+" yıllık kıdem";
+  $("#kalan").textContent=B.k;
+  $("#dl").innerHTML=[["Yıllık hak",B.h],["Devreden",B.dev],["Kullanılan",B.u],["Bekleyen",B.b]].map(x=>"<div><dt>"+x[0]+"</dt><dd>"+x[1]+"</dd></div>").join("");
+
+  const m={};
+  reqs.filter(r=>r.k==0&&r.s!="red").forEach(r=>{for(let d=P(r.a);d<=P(r.b);d.setDate(d.getDate()+1))m[K(d)]=r.s});
+  const ay=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  let g="";
+  for(let i=0;i<12;i++){
+    g+="<i class='l'>"+ay[i]+"</i>";
+    for(let d=1;d<=31;d++){
+      const dt=new Date(2026,i,d);
+      if(dt.getMonth()!=i){g+="<i style='background:none'></i>";continue}
+      const k=K(dt),w=dt.getDay();
+      g+="<i class='"+(m[k]=="onay"?"ap":m[k]=="bekle"?"pe":H.has(k)?"ho":(w==0||w==6)?"wk":"")+"'></i>";
+    }
+  }
+  $("#grid").innerHTML=g;
+
+  $("#rl").innerHTML=reqs.filter(r=>r.k==0).sort((x,y)=>y.a.localeCompare(x.a)).map(r=>
+    "<li><div><b>"+rng(r)+"</b><small>"+r.d+" iş günü"+(r.n?", "+esc(r.n):"")+"</small></div><span class='tag "+r.s+"'>"+ST[r.s]+"</span></li>").join("");
+
+  const pend=reqs.filter(r=>r.s=="bekle");
+  $("#pl").innerHTML=pend.length?pend.map(r=>
+    "<li><div><b>"+people[r.k].ad+"</b><small>"+rng(r)+", "+r.d+" iş günü"+(r.n?", "+esc(r.n):"")+"</small></div><div class='act'><button data-a='red' data-id='"+r.id+"'>Reddet</button><button data-a='onay' data-id='"+r.id+"'>Onayla</button></div></li>").join("")
+    :"<li class='empty'>Bekleyen talep yok.</li>";
+
+  $("#tb").innerHTML="<tr><th>Çalışan</th><th>Toplam hak</th><th>Kullanılan</th><th>Kalan</th></tr>"+people.map((p,k)=>{const b=bal(k);return"<tr><td>"+p.ad+"</td><td>"+b.t+"</td><td>"+b.u+"</td><td><b>"+b.k+"</b></td></tr>"}).join("");
+}
+
+function preview(){
+  const a=$("#a").value,b=$("#b").value,pv=$("#pv");
+  pv.className="pv";
+  if(!a||!b){pv.textContent="";return null}
+  if(b<a){pv.textContent="Bitiş tarihi başlangıçtan önce olamaz.";pv.className="pv err";return null}
+  const d=wd(a,b),k=bal(0).k;
+  if(d==0){pv.textContent="Seçilen aralıkta iş günü yok.";pv.className="pv err";return null}
+  if(d>k){pv.textContent=d+" iş günü seçtin, ancak kalan hakkın "+k+" gün.";pv.className="pv err";return null}
+  pv.textContent=d+" iş günü izin hakkından düşülecek.";pv.className="pv ok";
+  return d;
+}
+$("#a").addEventListener("change",()=>{if(!$("#b").value||$("#b").value<$("#a").value)$("#b").value=$("#a").value;preview()});
+$("#b").addEventListener("change",preview);
+$("#go").addEventListener("click",()=>{
+  const d=preview();
+  if(!d){if(!$("#a").value||!$("#b").value){$("#pv").textContent="Başlangıç ve bitiş tarihini seç.";$("#pv").className="pv err"}return}
+  reqs.push({id:nid++,k:0,a:$("#a").value,b:$("#b").value,d,s:"bekle",n:$("#n").value.trim()});
+  $("#a").value=$("#b").value=$("#n").value="";
+  draw();
+  $("#pv").textContent="Talebin yöneticine gönderildi.";$("#pv").className="pv ok";
+});
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-a]");
+  if(t){const r=reqs.find(x=>x.id==t.dataset.id);if(r){r.s=t.dataset.a;draw()}return}
+  const m=e.target.closest("[data-m]");
+  if(m){
+    document.querySelectorAll(".seg button").forEach(b=>b.classList.toggle("on",b==m));
+    $("#vc").hidden=m.dataset.m!="c";$("#vh").hidden=m.dataset.m!="h";
+  }
+});
+draw();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
+</body>
+</html>
